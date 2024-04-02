@@ -56,7 +56,7 @@ class Tree:
         return max(L) + 1
 
     def deriv(self, var):
-        """Computes the derivative of the tree with respect to a variable"""
+        """Calcule la dérivée de l'arbre par rapport à une variable"""
         if self.is_leaf():
             if self.__label == var:
                 return Tree('1')
@@ -65,39 +65,13 @@ class Tree:
         elif self.__label == '+':
             return Tree('+', self.child(0).deriv(var), self.child(1).deriv(var))
         elif self.__label == '*':
-            return Tree('+', Tree('*', self.child(0).deriv(var), self.child(1)),
+            return Tree('+',
+                        Tree('*', self.child(0).deriv(var), self.child(1)),
                         Tree('*', self.child(0), self.child(1).deriv(var)))
-
-    def substitute(self, t1, t2):
-        """Substitutes all occurrences of t1 with t2"""
-        if self == t1:
-            return t2
         else:
-            new_children = [child.substitute(t1, t2) for child in self.__children]
-            return Tree(self.__label, *new_children)
+            return Tree('0')
 
-    def simplify(self):
-        """Performs simplification of the tree"""
-        if self.is_leaf():
-            return self
-        elif self.__label == '+':
-            if self.child(0) == Tree('0'):
-                return self.child(1).simplify()
-            elif self.child(1) == Tree('0'):
-                return self.child(0).simplify()
-            else:
-                return Tree('+', self.child(0).simplify(), self.child(1).simplify())
-        elif self.__label == '*':
-            if self.child(0) == Tree('0') or self.child(1) == Tree('0'):
-                return Tree('0')
-            elif self.child(0) == Tree('1'):
-                return self.child(1).simplify()
-            elif self.child(1) == Tree('1'):
-                return self.child(0).simplify()
-            else:
-                return Tree('*', self.child(0).simplify(), self.child(1).simplify())
-        else:
-            return self
+
 
 
 
@@ -119,7 +93,16 @@ if __name__ == "__main__" :
     print(child_1.__str__())
     print(child_1.is_leaf())
 
-    print("Depth:", arbre.depth())
-    print("Derivative with respect to 'b':", arbre.deriv('b'))
-    print("Substitute 'a' with 'c':", arbre.substitute(Tree('a'), Tree('c')))
-    print("Simplified tree:", arbre.simplify())
+
+# Création de l'arbre représentant le polynôme 3*X^2 + 5*X + 7
+    polynome = Tree('+',
+                    Tree('+',
+                         Tree('+', Tree('3'), Tree('*', Tree('X'), Tree('X'))),
+                         Tree('*', Tree('5'), Tree('X'))),
+                    Tree('7'))
+
+    # Calcul de la dérivée par rapport à X
+    derivee = polynome.deriv('X')
+
+    # Affichage de la dérivée
+    print("La dérivée du polynôme 3*X^2 + 5*X + 7 par rapport à X est :", derivee)
